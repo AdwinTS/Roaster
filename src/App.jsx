@@ -2,14 +2,12 @@
 import React, { useState, useEffect } from 'react';
 
 function App() {
-  // State to manage the emoji based on hover
-  const [emoji, setEmoji] = useState('😎'); // Cooling glasses emoji
-  const [username, setUsername] = useState(''); // State for the input field
-  const [roastResult, setRoastResult] = useState(''); // State to store the generated roast
-  const [isLoading, setIsLoading] = useState(false); // State for loading indicator
-  const [error, setError] = useState(''); // State for error messages
+  const [emoji, setEmoji] = useState('😎');
+  const [username, setUsername] = useState('');
+  const [roastResult, setRoastResult] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  // State for the vanishing/appearing message on the left (small paragraphs)
   const messages = [
     "Unleash the truth hidden within the lines of code. Every commit tells a story, and we're here to read it.",
     "No code is truly safe from a thorough examination. Our algorithms are designed to find every hidden gem and potential pitfall.",
@@ -20,7 +18,6 @@ function App() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [messageVisible, setMessageVisible] = useState(true);
 
-  // State for the rotating keywords on the right
   const keywords = [
     "Efficiency",
     "Readability",
@@ -35,47 +32,41 @@ function App() {
   // Effect for vanishing/appearing message on the left
   useEffect(() => {
     const interval = setInterval(() => {
-      setMessageVisible(false); // Start fading out
+      setMessageVisible(false);
       setTimeout(() => {
         setCurrentMessageIndex((prevIndex) => (prevIndex + 1) % messages.length);
-        setMessageVisible(true); // Fade in new message
-      }, 1000); // Wait for fade-out to complete before changing message and fading in
-    }, 5000); // Change message every 5 seconds (including fade in/out)
+        setMessageVisible(true);
+      }, 1000);
+    }, 5000);
 
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   // Effect for rotating keywords on the right
   useEffect(() => {
     const interval = setInterval(() => {
-      setKeywordVisible(false); // Start fading out
+      setKeywordVisible(false);
       setTimeout(() => {
         setCurrentKeywordIndex((prevIndex) => (prevIndex + 1) % keywords.length);
-        setKeywordVisible(true); // Fade in new keyword
-      }, 500); // Wait for fade-out to complete before changing keyword and fading in
-    }, 2500); // Change keyword every 2.5 seconds
+        setKeywordVisible(true);
+      }, 500);
+    }, 2500);
 
-    return () => clearInterval(interval); // Cleanup on component unmount
+    return () => clearInterval(interval);
   }, []);
 
-  // Function to handle mouse entering the emoji area
-  const handleMouseEnter = () => {
-    setEmoji('🤫'); // Silent emoji
-  };
+  // Handle emoji hover
+  const handleMouseEnter = () => setEmoji('🤫');
+  const handleMouseLeave = () => setEmoji('😎');
 
-  // Function to handle mouse leaving the emoji area
-  const handleMouseLeave = () => {
-    setEmoji('😎'); // Back to cooling glasses emoji
-  };
-
-  // Function to handle input change
+  // Handle input change
   const handleInputChange = (event) => {
     setUsername(event.target.value);
-    setRoastResult(''); // Clear previous roast when typing
-    setError(''); // Clear previous error when typing
+    setRoastResult('');
+    setError('');
   };
 
-  // Function to handle the "Roast!" button click
+  // Function to handle the "Roast!" button click and API calls
   const handleRoast = async () => {
     if (!username.trim()) {
       setError("Please enter a GitHub username.");
@@ -87,7 +78,7 @@ function App() {
     setError('');
 
     try {
-      // 1. Fetch GitHub user data
+      // Fetch GitHub user data
       const githubResponse = await fetch(`https://api.github.com/users/${username}`);
       if (!githubResponse.ok) {
         if (githubResponse.status === 404) {
@@ -112,12 +103,11 @@ function App() {
 
       Roast for GitHub user "${username}":`;
 
-      // 2. Call Gemini API to generate the roast
+      // Call Gemini API to generate the roast
       let chatHistory = [];
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
       const payload = { contents: chatHistory };
-      // IMPORTANT: Access the API key from Vite's environment variables
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY; // <--- CHANGED THIS LINE
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
       const geminiResponse = await fetch(apiUrl, {
@@ -146,21 +136,21 @@ function App() {
   };
 
   return (
-    // Main container for the entire page, ensuring full height and centering
-    <div className="h-screen w-screen flex flex-col items-center justify-between bg-gray-900 text-white font-inter overflow-hidden"> {/* Added overflow-hidden to prevent scrollbars from animations */}
+    // Main page container with full height and width, dark background
+    <div className="h-screen w-screen flex flex-col items-center justify-between bg-gray-900 text-white font-inter overflow-hidden">
 
-      {/* Heading */}
+      {/* Page Heading */}
       <header className="w-full text-center py-8 px-4">
         <h1 className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-600 drop-shadow-lg">
           Roaster Pro
         </h1>
       </header>
 
-      {/* Interactive Emoji Section */}
-      <section className="flex items-center justify-center flex-grow w-full px-4 relative"> {/* Added relative for absolute positioning of side content */}
+      {/* Interactive Content Section (Emoji and side messages) */}
+      <section className="flex items-center justify-center flex-grow w-full px-4 relative">
 
-        {/* Dynamic Message to the Left */}
-        <div className="absolute left-4 md:left-8 lg:left-16 top-1/2 -translate-y-1/2 text-right hidden md:block max-w-xs"> {/* Added max-w-xs for paragraph width */}
+        {/* Dynamic Message on the Left */}
+        <div className="absolute left-4 md:left-8 lg:left-16 top-1/2 -translate-y-1/2 text-right hidden md:block max-w-xs">
           <p
             className={`text-xl md:text-2xl font-medium text-gray-400 transition-opacity duration-1000 ${
               messageVisible ? 'opacity-100' : 'opacity-0'
@@ -170,9 +160,9 @@ function App() {
           </p>
         </div>
 
-        {/* Emoji in the Center */}
+        {/* Central Interactive Emoji */}
         <div
-          className="text-9xl md:text-[12rem] lg:text-[15rem] cursor-pointer transition-transform duration-300 hover:scale-105 mx-auto" // mx-auto helps center it
+          className="text-9xl md:text-[12rem] lg:text-[15rem] cursor-pointer transition-transform duration-300 hover:scale-105 mx-auto"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           aria-label="Interactive Emoji"
@@ -181,8 +171,8 @@ function App() {
           {emoji}
         </div>
 
-        {/* Rotating Keywords to the Right */}
-        <div className="absolute right-4 md:right-8 lg:right-16 top-1/2 -translate-y-1/2 text-left hidden md:block max-w-xs"> {/* Added max-w-xs */}
+        {/* Rotating Keywords on the Right */}
+        <div className="absolute right-4 md:right-8 lg:right-16 top-1/2 -translate-y-1/2 text-left hidden md:block max-w-xs">
           <p
             className={`text-xl md:text-2xl font-bold text-purple-400 transition-opacity duration-500 ${
               keywordVisible ? 'opacity-100' : 'opacity-0'
@@ -194,14 +184,14 @@ function App() {
 
       </section>
 
-      {/* Message below the emoji */}
+      {/* Main Message */}
       <p className="mt-8 text-2xl md:text-3xl font-semibold text-gray-300 text-center w-full max-w-2xl px-4">
         This is the perfect roaster.
       </p>
 
-      {/* Input Field Section */}
+      {/* Input and Roast Result Section */}
       <footer className="w-full py-8 flex flex-col items-center px-4">
-        <div className="flex w-full max-w-md space-x-2"> {/* Container for input and button */}
+        <div className="flex w-full max-w-md space-x-2">
           <input
             type="text"
             placeholder="ENTER THE GITHUB USERNAME TO ROAST HEHE"
@@ -211,14 +201,14 @@ function App() {
           />
           <button
             onClick={handleRoast}
-            disabled={isLoading} // Disable button when loading
+            disabled={isLoading}
             className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Roasting...' : 'Roast!'}
           </button>
         </div>
 
-        {/* Roast Result / Loading / Error Display */}
+        {/* Loading, Error, or Roast Output */}
         {isLoading && (
           <p className="mt-4 text-lg text-purple-400">Fetching GitHub data and crafting the roast...</p>
         )}
@@ -226,7 +216,7 @@ function App() {
           <p className="mt-4 text-lg text-red-500">{error}</p>
         )}
         {roastResult && (
-          <div className="mt-6 p-4 bg-gray-800 rounded-lg shadow-inner max-w-2xl text-center overflow-auto max-h-48"> {/* Changed max-w-md to max-w-2xl, added overflow-auto and max-h-48 */}
+          <div className="mt-6 p-4 bg-gray-800 rounded-lg shadow-inner max-w-2xl text-center overflow-auto max-h-48">
             <p className="text-xl italic text-gray-300">"{roastResult}"</p>
           </div>
         )}
