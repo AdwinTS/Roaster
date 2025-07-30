@@ -35,5 +35,5 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone [<your-repo-url>](https://github.com/AdwinTS/Roaster.git)
+   git clone https://github.com/AdwinTS/Roaster.git
    cd Roaster # Or your project folder name
